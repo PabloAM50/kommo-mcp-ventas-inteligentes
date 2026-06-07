@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Cliente ABC",
+    "subdomain": "clienteabc",
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGci..."
+  },
+  {
+    "name": "Cliente XYZ",
+    "subdomain": "clientexyz",
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGci..."
+  }
+]
