@@ -12,9 +12,13 @@ export interface KommoAccount {
 }
 
 export function loadAccounts(): KommoAccount[] {
+  if (process.env.KOMMO_ACCOUNTS) {
+    return JSON.parse(process.env.KOMMO_ACCOUNTS);
+  }
+
   if (!existsSync(ACCOUNTS_PATH)) {
     throw new Error(
-      `No se encontró accounts.json en ${ACCOUNTS_PATH}. Copia accounts.example.json y configura tus cuentas.`
+      `No se encontró accounts.json en ${ACCOUNTS_PATH}. Copia accounts.example.json y configura tus cuentas, o define la variable de entorno KOMMO_ACCOUNTS.`
     );
   }
   return JSON.parse(readFileSync(ACCOUNTS_PATH, "utf-8"));

@@ -14,7 +14,7 @@ import { customFieldTools } from "./tools/custom-fields.js";
 
 const server = new McpServer({
   name: "kommo-mcp",
-  version: "1.1.0",
+  version: "1.2.0",
 });
 
 const allTools: Record<string, { description: string; schema: any; handler: (params: any) => Promise<any> }> = {
