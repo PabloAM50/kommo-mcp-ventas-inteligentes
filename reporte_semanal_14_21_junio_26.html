@@ -200,16 +200,31 @@
       main { padding: 28px 16px 48px; }
 
       /* carrusel — pipeline movimientos */
-      .pipe-moves-wrap { padding: 0 !important; }
+      .pipe-moves-wrap {
+        padding: 0 !important;
+        position: relative;
+      }
+      .pipe-moves-wrap::after {
+        content: '';
+        position: absolute;
+        top: 0; right: 0; bottom: 0;
+        width: 64px;
+        background: linear-gradient(to left, rgba(255,255,255,0.96) 0%, transparent 100%);
+        pointer-events: none;
+        z-index: 2;
+      }
       .pipe-moves-grid {
         display: flex !important;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
         -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
+        scrollbar-width: thin;
+        scrollbar-color: var(--gold) var(--divider);
         border-left: none !important;
       }
-      .pipe-moves-grid::-webkit-scrollbar { display: none; }
+      .pipe-moves-grid::-webkit-scrollbar { height: 3px; }
+      .pipe-moves-grid::-webkit-scrollbar-track { background: var(--divider); }
+      .pipe-moves-grid::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
       .pipe-moves-grid > div {
         flex: 0 0 72%;
         scroll-snap-align: start;
@@ -219,16 +234,33 @@
       .pipe-moves-grid > div:last-child { border-right: none !important; }
 
       /* carrusel — conversaciones */
+      .talks-wrap {
+        position: relative;
+        margin-bottom: 32px;
+      }
+      .talks-wrap::after {
+        content: '';
+        position: absolute;
+        top: 0; right: 0; bottom: 0;
+        width: 64px;
+        background: linear-gradient(to left, rgba(255,255,255,0.96) 0%, transparent 100%);
+        pointer-events: none;
+        z-index: 2;
+      }
       .talks-grid {
         display: flex !important;
         overflow-x: auto !important;
         scroll-snap-type: x mandatory;
         -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
+        scrollbar-width: thin;
+        scrollbar-color: var(--gold) var(--divider);
         background: var(--white) !important;
         gap: 0 !important;
+        margin-bottom: 0 !important;
       }
-      .talks-grid::-webkit-scrollbar { display: none; }
+      .talks-grid::-webkit-scrollbar { height: 3px; }
+      .talks-grid::-webkit-scrollbar-track { background: var(--divider); }
+      .talks-grid::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
       .talks-grid > div {
         flex: 0 0 72% !important;
         scroll-snap-align: start;
@@ -657,6 +689,7 @@
 
   <!-- CONVERSACIONES -->
   <div class="eyebrow">Conversaciones esta semana</div>
+  <div class="talks-wrap">
   <div class="talks-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--divider);border:1px solid var(--divider);border-radius:4px;overflow:hidden;margin-bottom:32px;">
 
     <div style="background:var(--white);padding:24px 20px;">
@@ -698,6 +731,7 @@
     </div>
 
   </div>
+  </div><!-- /.talks-wrap -->
 
   <!-- MOVIMIENTOS DE PIPELINE -->
   <div class="eyebrow">Movimientos de pipeline esta semana</div>
