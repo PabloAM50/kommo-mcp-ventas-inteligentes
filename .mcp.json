@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "kommo": {
+      "command": "node",
+      "args": ["C:\\Users\\pablo\\Documents\\MIAIA.AI\\Clientes\\Fernando\\KommoMCP\\dist\\index.js"],
+      "env": {
+        "KOMMO_ACCOUNTS": "[{\"name\":\"Molina Casasola Cirujanos\",\"subdomain\":\"molinacasasolacirujanos\",\"token\":\"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjdkMjFjMmE0YzQzNzIwZGMzYWEyMmNlMjI5YmE0YjY2NDk3NzExNWQ0ZjQ5NWI2NzgxZmEyNGI0ZWIxNDZiZGU2Yjg0N2YxNzhiNDk2ODk5In0.eyJhdWQiOiI1YjBlNzIyZS1mNDAwLTQ0YmQtYmQyZC00YTJjYmRhYmMyNzYiLCJqdGkiOiI3ZDIxYzJhNGM0MzcyMGRjM2FhMjJjZTIyOWJhNGI2NjQ5NzcxMTVkNGY0OTViNjc4MWZhMjRiNGViMTQ2YmRlNmI4NDdmMTc4YjQ5Njg5OSIsImlhdCI6MTc4MjA2NTU2MSwibmJmIjoxNzgyMDY1NTYxLCJleHAiOjE5Mzk3NjY0MDAsInN1YiI6IjE0ODUwMTU1IiwiZ3JhbnRfdHlwZSI6IiIsImFjY291bnRfaWQiOjM2MjQ3MjE5LCJiYXNlX2RvbWFpbiI6ImtvbW1vLmNvbSIsInZlcnNpb24iOjIsInNjb3BlcyI6WyJwdXNoX25vdGlmaWNhdGlvbnMiLCJmaWxlcyIsImNybSIsImZpbGVzX2RlbGV0ZSIsIm5vdGlmaWNhdGlvbnMiXSwiaGFzaF91dWlkIjoiM2Q4OWEwNjUtNDI2Zi00Yjc1LWFjMTAtYTBlNWQwNzY5ZDM2IiwiYXBpX2RvbWFpbiI6ImFwaS1nLmtvbW1vLmNvbSJ9.JU9TfqkWrszd58ZmxcFuhNXd_a7bUna5BPWvCCNaSXQm_KCjq9RP-dbT8gTADdkU6HHbFP7567O6X6qLouJrG8SgSQgpu4dHwLdtMN0WceA2bHP-PRqna2ejiq4rI-hOEOm5TiSFbmVxytVwGkcsDKEow0_7ok6TGZkoB7OpPMV0csS1-nc0T8T5WbAQIaR4yQvQ_MRlwMAQI2TWEZGn_xRLrrKET3nihNefW56e_0JWlpP6HtBlQHxTaJ_oquooxpXqYc9Kcyylg_2u90ekn85jqGdfb2eX_OCY4SJ_DlipfKntzVPeFpm_LuaOQlhwGp7xRaYTM565pb-fz7JJCw\"}]"
+      }
+    }
+  }
+}
