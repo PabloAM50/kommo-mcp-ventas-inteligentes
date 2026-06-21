@@ -136,6 +136,9 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok", tools: Object.keys(allTools).length, version: "1.2.0" });
 });
 
+// Serve Assets folder (logo, images)
+app.use("/assets", express.static(path.resolve(__dirname, "..", "Assets")));
+
 // Serve weekly HTML reports — only files matching reporte_semanal_NN.html
 const reportsDir = path.resolve(__dirname, "..");
 app.get("/reportes/Molinacasasola", (_req, res) => {
