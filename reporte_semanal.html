@@ -187,8 +187,58 @@
       margin-bottom: 32px;
     }
     @media (max-width: 680px) {
+      /* header apilado */
+      header { padding: 20px 20px 16px; }
+      .header-inner { flex-direction: column; align-items: flex-start; gap: 14px; }
+      .report-info { text-align: left; }
+      .report-title { font-size: 22px; }
+      .report-type { margin-bottom: 4px; }
+
+      /* grids generales */
       .kpi-grid { grid-template-columns: repeat(2, 1fr); }
       .two-col, .three-col { grid-template-columns: 1fr; }
+      main { padding: 28px 16px 48px; }
+
+      /* carrusel — pipeline movimientos */
+      .pipe-moves-wrap { padding: 0 !important; }
+      .pipe-moves-grid {
+        display: flex !important;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        border-left: none !important;
+      }
+      .pipe-moves-grid::-webkit-scrollbar { display: none; }
+      .pipe-moves-grid > div {
+        flex: 0 0 72%;
+        scroll-snap-align: start;
+        padding: 24px 20px !important;
+        border-right: 1px solid var(--divider) !important;
+      }
+      .pipe-moves-grid > div:last-child { border-right: none !important; }
+
+      /* carrusel — conversaciones */
+      .talks-grid {
+        display: flex !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        background: var(--white) !important;
+        gap: 0 !important;
+      }
+      .talks-grid::-webkit-scrollbar { display: none; }
+      .talks-grid > div {
+        flex: 0 0 72% !important;
+        scroll-snap-align: start;
+        border-right: 1px solid var(--divider) !important;
+      }
+      .talks-grid > div:last-child { border-right: none !important; }
+
+      /* exec summary */
+      .exec-grid { grid-template-columns: 1fr !important; gap: 24px; }
+      .exec { padding: 28px 20px !important; }
     }
 
     /* ── CARD ────────────────────────────────────────── */
@@ -651,8 +701,8 @@
 
   <!-- MOVIMIENTOS DE PIPELINE -->
   <div class="eyebrow">Movimientos de pipeline esta semana</div>
-  <div style="background:var(--white);border:1px solid var(--divider);border-radius:4px;padding:28px;margin-bottom:32px;">
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-left:1px solid var(--divider);">
+  <div class="pipe-moves-wrap" style="background:var(--white);border:1px solid var(--divider);border-radius:4px;padding:28px;margin-bottom:32px;">
+    <div class="pipe-moves-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-left:1px solid var(--divider);">
 
       <div style="padding:0 24px;border-right:1px solid var(--divider);">
         <div style="font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--warm-lt);margin-bottom:10px;">Citas agendadas</div>

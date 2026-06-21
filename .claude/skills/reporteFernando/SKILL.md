@@ -118,11 +118,21 @@ with open("Assets/logo-molina-casasola.png", "rb") as f:
 
 ## 4. Guardar el archivo
 
+El nombre incluye el rango de fechas de la semana:
+
 ```
-reporte_semanal_NN.html
+reporte_semanal_DD_DD_mes_AA.html
 ```
 
-Donde NN es el número siguiente al último archivo existente (con cero inicial: 01, 02, 03...).
+Ejemplos:
+- `reporte_semanal_14_21_junio_26.html`
+- `reporte_semanal_22_28_junio_26.html`
+- `reporte_semanal_01_07_julio_26.html`
+
+Reglas:
+- DD = día sin cero inicial (14, 7, 1...)
+- mes = nombre del mes en español en minúsculas (enero, febrero, marzo, abril, mayo, junio, julio, agosto, septiembre, octubre, noviembre, diciembre)
+- AA = últimos 2 dígitos del año (26, 27...)
 
 También sobrescribir `reporte_semanal.html` como template base actualizado.
 

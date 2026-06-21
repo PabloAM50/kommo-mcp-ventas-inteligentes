@@ -140,7 +140,7 @@ app.get("/health", (_req, res) => {
 const reportsDir = path.resolve(__dirname, "..");
 app.get("/reportes/Molinacasasola", (_req, res) => {
   const files = readdirSync(reportsDir)
-    .filter(f => /^reporte_semanal_\d+\.html$/.test(f))
+    .filter(f => /^reporte_semanal_\d{1,2}_\d{1,2}_[a-z]+_\d{2}\.html$/.test(f))
     .sort()
     .reverse();
   if (files.length === 0) { res.status(404).send("No hay reportes disponibles."); return; }
@@ -148,7 +148,7 @@ app.get("/reportes/Molinacasasola", (_req, res) => {
 });
 app.get("/reportes/Molinacasasola/:filename", (req, res) => {
   const { filename } = req.params;
-  if (!/^reporte_semanal_\d+\.html$/.test(filename)) {
+  if (!/^reporte_semanal_\d{1,2}_\d{1,2}_[a-z]+_\d{2}\.html$/.test(filename)) {
     res.status(404).send("Not found");
     return;
   }
