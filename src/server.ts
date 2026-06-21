@@ -1,8 +1,12 @@
 import { randomUUID } from "node:crypto";
+import { readdirSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
+import express from "express";
 import { accountTools } from "./tools/accounts.js";
 import { leadTools } from "./tools/leads.js";
 import { contactTools } from "./tools/contacts.js";
@@ -54,6 +58,7 @@ function createServer(): McpServer {
   return server;
 }
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = parseInt(process.env.PORT || "3000", 10);
 
 const app = createMcpExpressApp({ host: "0.0.0.0" });
@@ -129,6 +134,25 @@ app.delete("/mcp", async (req, res) => {
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", tools: Object.keys(allTools).length, version: "1.2.0" });
+});
+
+// Serve weekly HTML reports — only files matching reporte_semanal_NN.html
+const reportsDir = path.resolve(__dirname, "..");
+app.get("/reportes/Molinacasasola", (_req, res) => {
+  const files = readdirSync(reportsDir)
+    .filter(f => /^reporte_semanal_\d+\.html$/.test(f))
+    .sort()
+    .reverse();
+  if (files.length === 0) { res.status(404).send("No hay reportes disponibles."); return; }
+  res.redirect(`/reportes/Molinacasasola/${files[0]}`);
+});
+app.get("/reportes/Molinacasasola/:filename", (req, res) => {
+  const { filename } = req.params;
+  if (!/^reporte_semanal_\d+\.html$/.test(filename)) {
+    res.status(404).send("Not found");
+    return;
+  }
+  res.sendFile(path.join(reportsDir, filename));
 });
 
 app.listen(PORT, "0.0.0.0", () => {
