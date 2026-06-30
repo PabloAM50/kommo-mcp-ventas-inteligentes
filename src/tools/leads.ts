@@ -12,6 +12,7 @@ export const leadTools = {
       limit: z.number().optional().describe("Leads por página, max 250 (default 50)"),
       query: z.string().optional().describe("Búsqueda por nombre, teléfono, email, etc."),
       responsible_user_id: z.number().optional().describe("Filtrar por ID del responsable"),
+      pipeline_id: z.number().optional().describe("Filtrar por ID de pipeline (embudo)"),
       statuses: z
         .array(
           z.object({
@@ -29,6 +30,7 @@ export const leadTools = {
       limit?: number;
       query?: string;
       responsible_user_id?: number;
+      pipeline_id?: number;
       statuses?: { pipeline_id: number; status_id: number }[];
       order?: string;
     }) => {
@@ -40,10 +42,17 @@ export const leadTools = {
       const query: Record<string, string> = {
         page: String(params.page ?? 1),
         limit: String(params.limit ?? 50),
-        with: "contacts,loss_reason,catalog_elements,source_id",
+        with: "contacts,loss_reason,catalog_elements,source_id,tags",
       };
       if (params.query) query["query"] = params.query;
       if (params.responsible_user_id) query["filter[responsible_user_id]"] = String(params.responsible_user_id);
+      if (params.pipeline_id) query["filter[pipeline_id]"] = String(params.pipeline_id);
+      if (params.statuses && params.statuses.length > 0) {
+        params.statuses.forEach((s, i) => {
+          query[`filter[${i}][pipeline_id]`] = String(s.pipeline_id);
+          query[`filter[${i}][status_id]`] = String(s.status_id);
+        });
+      }
       if (params.order) query["order[updated_at]"] = params.order === "asc" ? "asc" : "desc";
 
       const data = await client.request("GET", "/leads", undefined, query);
@@ -63,6 +72,11 @@ export const leadTools = {
           updated_at: l.updated_at,
           loss_reason: l.loss_reason,
           contacts: l._embedded?.contacts,
+          tags: (l._embedded?.tags ?? []).map((t: any) => ({
+            id: t.id,
+            name: t.name,
+            color: t.color,
+          })),
         })),
       };
     },

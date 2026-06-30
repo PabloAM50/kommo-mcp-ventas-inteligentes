@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reporte Semanal · Molina Casasola Cirujanos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+    :root {
+      --cream:#FAF8F3; --cream-card:#F5EFE6; --gold:#C5963A; --gold-fade:#F9F2E5;
+      --gold-light:#E2C07A; --charcoal:#1E1A17; --warm-mid:#5A5047; --warm-lt:#8A7D72;
+      --divider:#E5DDD3; --white:#FFFFFF;
+    }
+    body { font-family:'Inter',system-ui,sans-serif; background:var(--cream); color:var(--warm-mid); min-height:100vh; -webkit-font-smoothing:antialiased; }
+    header { background:var(--white); border-bottom:1px solid var(--divider); padding:32px 48px 28px; }
+    .header-inner { max-width:1080px; margin:0 auto; display:flex; align-items:flex-end; justify-content:space-between; gap:24px; }
+    .brand { display:flex; flex-direction:column; gap:0; }
+    .brand-name { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:600; letter-spacing:4px; text-transform:uppercase; color:var(--gold); line-height:1; }
+    .brand-sub { font-family:'Cormorant Garamond',serif; font-size:11px; font-weight:300; letter-spacing:3.5px; text-transform:uppercase; color:var(--gold); margin-top:5px; padding-top:5px; border-top:1px solid var(--gold-light); }
+    .report-info { text-align:right; }
+    .report-type { font-size:10px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:6px; }
+    .report-title { font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:300; color:var(--charcoal); letter-spacing:1px; }
+    .report-date { font-size:12px; color:var(--warm-lt); margin-top:4px; font-weight:300; }
+    main { max-width:1080px; margin:0 auto; padding:48px 24px 72px; }
+    .eyebrow { font-size:9px; font-weight:600; letter-spacing:3.5px; text-transform:uppercase; color:var(--gold); margin-bottom:20px; display:flex; align-items:center; gap:16px; }
+    .eyebrow::after { content:''; flex:1; height:1px; background:var(--divider); }
+    .kpi-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:1px; background:var(--divider); border:1px solid var(--divider); border-radius:4px; overflow:hidden; margin-bottom:48px; }
+    .kpi-card { background:var(--white); padding:28px 20px 24px; position:relative; }
+    .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--gold); opacity:0; transition:opacity .3s; }
+    .kpi-card:hover::before { opacity:1; }
+    .kpi-label { font-size:9px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--warm-lt); margin-bottom:12px; line-height:1.5; }
+    .kpi-value { font-family:'Cormorant Garamond',serif; font-size:48px; font-weight:300; color:var(--charcoal); line-height:1; }
+    .kpi-sub { font-size:10px; color:var(--warm-lt); margin-top:8px; line-height:1.5; }
+    .kpi-card.accent .kpi-value { color:var(--gold); }
+    .two-col { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:32px; }
+    .three-col { display:grid; grid-template-columns:5fr 4fr; gap:24px; margin-bottom:32px; }
+    @media (max-width:680px) { .kpi-grid{grid-template-columns:repeat(2,1fr);} .two-col,.three-col{grid-template-columns:1fr;} main{padding:28px 16px 48px;} header{padding:20px 20px 16px;} .header-inner{flex-direction:column;align-items:flex-start;gap:14px;} .report-info{text-align:left;} .report-title{font-size:22px;} }
+    .card { background:var(--white); border:1px solid var(--divider); border-radius:4px; padding:32px 28px; }
+    .card-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:400; color:var(--charcoal); letter-spacing:.5px; margin-bottom:6px; }
+    .card-sub { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--warm-lt); margin-bottom:24px; padding-bottom:20px; border-bottom:1px solid var(--divider); }
+    .funnel { display:flex; flex-direction:column; gap:10px; }
+    .funnel-row { display:grid; grid-template-columns:148px 1fr 32px; align-items:center; gap:12px; }
+    .funnel-name { font-size:11px; color:var(--warm-mid); font-weight:400; letter-spacing:.3px; }
+    .bar-track { height:6px; background:var(--cream-card); overflow:hidden; }
+    .bar-fill { height:100%; background:var(--gold); }
+    .bar-fill.muted { background:var(--divider); }
+    .bar-fill.warn { background:#C0856A; }
+    .funnel-n { font-size:12px; font-weight:500; color:var(--charcoal); text-align:right; }
+    .treatment-list { display:flex; flex-direction:column; gap:18px; }
+    .treatment-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px; }
+    .treatment-name { font-size:13px; color:var(--charcoal); font-weight:400; letter-spacing:.3px; }
+    .treatment-pct { font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--gold); font-weight:300; }
+    .timeline { display:flex; flex-direction:column; }
+    .tl-item { display:flex; gap:16px; padding:14px 0; border-bottom:1px solid var(--divider); }
+    .tl-item:last-child { border-bottom:none; }
+    .tl-marker { width:6px; height:6px; border-radius:50%; background:var(--gold); margin-top:6px; flex-shrink:0; }
+    .tl-text { font-size:12px; color:var(--warm-mid); line-height:1.6; }
+    .tl-text strong { color:var(--charcoal); font-weight:500; }
+    .tl-time { font-size:10px; color:var(--warm-lt); margin-top:2px; letter-spacing:.5px; }
+    .alert-list { display:flex; flex-direction:column; gap:1px; background:var(--divider); border:1px solid var(--divider); border-radius:4px; overflow:hidden; }
+    .alert-item { background:var(--white); padding:16px 20px; display:flex; gap:14px; align-items:flex-start; border-left:3px solid var(--gold); }
+    .alert-title { font-size:12px; font-weight:500; color:var(--charcoal); margin-bottom:2px; }
+    .alert-desc { font-size:11px; color:var(--warm-lt); line-height:1.6; }
+    .exec { background:var(--charcoal); border-radius:4px; padding:40px 40px; margin-top:32px; }
+    .exec-grid { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:start; }
+    @media (max-width:680px){ .exec-grid{grid-template-columns:1fr;gap:24px;} .exec{padding:28px 20px;} }
+    .exec-title { font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:300; color:var(--white); letter-spacing:1px; margin-bottom:6px; }
+    .exec-sub { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:18px; }
+    .exec-body { font-size:13px; line-height:1.9; color:rgba(255,255,255,.55); font-weight:300; }
+    .exec-body strong { color:rgba(255,255,255,.85); font-weight:400; }
+    .exec-stat-list { display:flex; flex-direction:column; gap:0; }
+    .exec-stat { display:flex; justify-content:space-between; align-items:baseline; padding:13px 0; border-bottom:1px solid rgba(255,255,255,.08); }
+    .exec-stat:last-child { border-bottom:none; }
+    .exec-stat-label { font-size:11px; color:rgba(255,255,255,.40); letter-spacing:.5px; }
+    .exec-stat-val { font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:300; color:var(--gold); }
+    footer { border-top:1px solid var(--divider); text-align:center; padding:28px 24px; background:var(--white); }
+    .footer-brand { font-family:'Cormorant Garamond',serif; font-size:14px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:6px; }
+    .footer-note { font-size:10px; color:var(--warm-lt); letter-spacing:.5px; }
+    .prog-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--divider); border:1px solid var(--divider); border-radius:4px; overflow:hidden; margin-top:8px; }
+    .prog-cell { background:var(--cream); padding:24px 20px; text-align:center; }
+    .prog-val { font-family:'Cormorant Garamond',serif; font-size:40px; font-weight:300; color:var(--gold); line-height:1; }
+    .prog-lbl { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--warm-lt); margin-top:8px; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-name">Molina Casasola</div>
+      <div class="brand-sub">Cirugía &amp; Medicina Estética</div>
+    </div>
+    <div class="report-info">
+      <div class="report-type">Reporte Semanal de CRM</div>
+      <div class="report-title">Resumen de Actividad</div>
+      <div class="report-date">22 – 28 de Junio, 2026</div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- KPIs -->
+  <div class="eyebrow" style="margin-top:8px;">Métricas clave de la semana</div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Leads activos<br>Meta Ads</div>
+      <div class="kpi-value">250</div>
+      <div class="kpi-sub">Embudo comercial</div>
+    </div>
+    <div class="kpi-card accent">
+      <div class="kpi-label">Citas agendadas<br>esta semana</div>
+      <div class="kpi-value">34</div>
+      <div class="kpi-sub">110 acumuladas en pipeline</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Nuevos leads<br>captados</div>
+      <div class="kpi-value">132</div>
+      <div class="kpi-sub">En los últimos 7 días</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Conversaciones<br>nuevas</div>
+      <div class="kpi-value">50</div>
+      <div class="kpi-sub">Recibidas esta semana</div>
+    </div>
+    <div class="kpi-card accent">
+      <div class="kpi-label">Conversión<br>lograda</div>
+      <div class="kpi-value">1</div>
+      <div class="kpi-sub">Tratamiento ganado</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Leads orgánicos<br>(pool)</div>
+      <div class="kpi-value">250</div>
+      <div class="kpi-sub">Comentarios de redes</div>
+    </div>
+  </div>
+
+  <!-- EMBUDO COMERCIAL META ADS + TRATAMIENTOS -->
+  <div class="three-col">
+    <div class="card">
+      <div class="card-title">Embudo comercial · Meta Ads</div>
+      <div class="card-sub">Distribución actual de leads por etapa</div>
+      <div class="funnel">
+      <div class="funnel-row">
+        <div class="funnel-name">Leads Entrantes</div>
+        <div class="bar-track"><div class="bar-fill " style="width:0%"></div></div>
+        <div class="funnel-n">0</div>
+      </div>
+      <div class="funnel-row">
+        <div class="funnel-name">Enviamos WhatsApp</div>
+        <div class="bar-track"><div class="bar-fill " style="width:74%"></div></div>
+        <div class="funnel-n">81</div>
+      </div>
+      <div class="funnel-row">
+        <div class="funnel-name">Cita agendada</div>
+        <div class="bar-track"><div class="bar-fill " style="width:100%"></div></div>
+        <div class="funnel-n">110</div>
+      </div>
+      <div class="funnel-row">
+        <div class="funnel-name">No interesado</div>
+        <div class="bar-track"><div class="bar-fill muted" style="width:50%"></div></div>
+        <div class="funnel-n">55</div>
+      </div>
+      <div class="funnel-row">
+        <div class="funnel-name">Cita confirmada</div>
+        <div class="bar-track"><div class="bar-fill " style="width:1%"></div></div>
+        <div class="funnel-n">1</div>
+      </div>
+      <div class="funnel-row">
+        <div class="funnel-name">Asistió a la cita</div>
+        <div class="bar-track"><div class="bar-fill " style="width:1%"></div></div>
+        <div class="funnel-n">1</div>
+      </div>
+      <div class="funnel-row">
+        <div class="funnel-name">Contrata tratamiento</div>
+        <div class="bar-track"><div class="bar-fill " style="width:0%"></div></div>
+        <div class="funnel-n">0</div>
+      </div>
+      </div>
+      <div class="funnel" style="margin-top:16px;border-top:1px solid var(--divider);padding-top:16px;">
+        <div class="funnel-row"><div class="funnel-name">Logrado con éxito</div><div class="bar-track"><div class="bar-fill" style="width:1%"></div></div><div class="funnel-n">1</div></div>
+        <div class="funnel-row"><div class="funnel-name">Ventas perdidas</div><div class="bar-track"><div class="bar-fill muted" style="width:1%"></div></div><div class="funnel-n">1</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Tratamientos más demandados</div>
+      <div class="card-sub">Según intereses reales de los leads</div>
+      <div class="treatment-list">
+    <div class="treatment-item">
+      <div class="treatment-row">
+        <div class="treatment-name">SmartLipo</div>
+        <div class="treatment-pct">36%</div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:100%;opacity:1"></div></div>
+    </div>
+    <div class="treatment-item">
+      <div class="treatment-row">
+        <div class="treatment-name">Blefaroplastia</div>
+        <div class="treatment-pct">32%</div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:89%;opacity:0.82"></div></div>
+    </div>
+    <div class="treatment-item">
+      <div class="treatment-row">
+        <div class="treatment-name">Armonización facial</div>
+        <div class="treatment-pct">21%</div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:58%;opacity:0.64"></div></div>
+    </div>
+    <div class="treatment-item">
+      <div class="treatment-row">
+        <div class="treatment-name">Rinoplastia</div>
+        <div class="treatment-pct">11%</div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:31%;opacity:0.46"></div></div>
+    </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRESIÓN SEMANAL (SECCIÓN DESTACADA) -->
+  <div class="eyebrow">Progresión dentro del embudo comercial · esta semana</div>
+  <div class="card" style="margin-bottom:32px;">
+    <div class="card-title">Movimiento comercial de Meta Ads</div>
+    <div class="card-sub">Leads que avanzaron a cada etapa durante la semana</div>
+    <div class="prog-grid">
+      <div class="prog-cell"><div class="prog-val">25</div><div class="prog-lbl">WhatsApps enviados</div></div>
+      <div class="prog-cell"><div class="prog-val">34</div><div class="prog-lbl">Citas agendadas</div></div>
+      <div class="prog-cell"><div class="prog-val">1</div><div class="prog-lbl">Citas confirmadas</div></div>
+      <div class="prog-cell"><div class="prog-val">1</div><div class="prog-lbl">Asistencias a cita</div></div>
+      <div class="prog-cell"><div class="prog-val">132</div><div class="prog-lbl">Nuevos leads</div></div>
+      <div class="prog-cell"><div class="prog-val">1</div><div class="prog-lbl">Logrados</div></div>
+    </div>
+  </div>
+
+  <!-- CONVERSACIONES + ACTIVIDAD -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Conversaciones semanales</div>
+      <div class="card-sub">Nuevas conversaciones por canal</div>
+      <div class="funnel">
+        <div class="funnel-row"><div class="funnel-name">Nuevas recibidas</div><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><div class="funnel-n">50</div></div>
+        <div class="funnel-row"><div class="funnel-name">Vía Instagram</div><div class="bar-track"><div class="bar-fill" style="width:54%"></div></div><div class="funnel-n">27</div></div>
+        <div class="funnel-row"><div class="funnel-name">Vía Facebook</div><div class="bar-track"><div class="bar-fill" style="width:28%"></div></div><div class="funnel-n">14</div></div>
+        <div class="funnel-row"><div class="funnel-name">Vía Chat web</div><div class="bar-track"><div class="bar-fill" style="width:18%"></div></div><div class="funnel-n">9</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Actividad reciente</div>
+      <div class="card-sub">Línea de tiempo de la semana</div>
+      <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-marker"></div>
+        <div>
+          <div class="tl-text"><strong>Nuevo lead — SmartLipo</strong> · vía Meta Ads</div>
+          <div class="tl-time">28 jun, 23:12 h</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-marker"></div>
+        <div>
+          <div class="tl-text"><strong>Nuevo lead — Blefaroplastia</strong> · vía Meta Ads</div>
+          <div class="tl-time">28 jun, 23:01 h</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-marker"></div>
+        <div>
+          <div class="tl-text"><strong>Nuevo lead — Blefaroplastia</strong> · vía Meta Ads</div>
+          <div class="tl-time">28 jun, 21:05 h</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-marker"></div>
+        <div>
+          <div class="tl-text"><strong>Nuevo lead — SmartLipo</strong> · vía Meta Ads</div>
+          <div class="tl-time">28 jun, 16:38 h</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-marker"></div>
+        <div>
+          <div class="tl-text"><strong>Nuevo lead — Rinoplastia</strong> · vía Meta Ads</div>
+          <div class="tl-time">28 jun, 14:06 h</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-marker"></div>
+        <div>
+          <div class="tl-text"><strong>Nuevo lead — Rinoplastia</strong> · vía Meta Ads</div>
+          <div class="tl-time">28 jun, 12:53 h</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-marker"></div>
+        <div>
+          <div class="tl-text"><strong>Nuevo lead — SmartLipo</strong> · vía Meta Ads</div>
+          <div class="tl-time">28 jun, 11:54 h</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-marker"></div>
+        <div>
+          <div class="tl-text"><strong>Nuevo lead — SmartLipo</strong> · vía Meta Ads</div>
+          <div class="tl-time">28 jun, 09:14 h</div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATOS DESTACADOS -->
+  <div class="eyebrow">Datos destacados</div>
+  <div class="alert-list" style="margin-bottom:32px;">
+    <div class="alert-item"><div><div class="alert-title">Tratamiento estrella</div><div class="alert-desc">SmartLipo lidera el interés con 29 solicitudes esta semana (36%), seguido de Blefaroplastia (32%).</div></div></div>
+    <div class="alert-item"><div><div class="alert-title">Citas en marcha</div><div class="alert-desc">110 citas agendadas acumuladas en el embudo comercial, con 34 nuevas esta semana.</div></div></div>
+    <div class="alert-item"><div><div class="alert-title">Captación creciente</div><div class="alert-desc">132 nuevos leads captados y 50 conversaciones nuevas recibidas durante la semana.</div></div></div>
+  </div>
+
+  <!-- RESUMEN EJECUTIVO -->
+  <div class="exec">
+    <div class="exec-grid">
+      <div>
+        <div class="exec-sub">Resumen ejecutivo</div>
+        <div class="exec-title">Una semana de avance comercial</div>
+        <div class="exec-body" style="margin-top:18px;">
+          La semana del <strong>22 – 28 de Junio, 2026</strong> refleja una <strong>actividad comercial sostenida</strong> en el embudo de Meta Ads. Se captaron <strong>132 nuevos leads</strong>, se agendaron <strong>34 nuevas citas</strong> y se contactaron 25 leads por WhatsApp. La demanda se concentra en <strong>SmartLipo</strong> y Blefaroplastia, reflejando el interés real de los potenciales pacientes. El equipo recibió 50 nuevas conversaciones a través de Instagram, Facebook y el chat web. Los leads orgánicos (comentarios de redes) permanecen como pool de entrada, mientras el embudo comercial de Meta Ads concentra el procesamiento real de los tratamientos, con <strong>110 citas acumuladas</strong> y una conversión lograda.
+        </div>
+      </div>
+      <div>
+        <div class="exec-sub">Estadísticas</div>
+        <div class="exec-stat-list">
+          <div class="exec-stat"><div class="exec-stat-label">Leads activos Meta Ads</div><div class="exec-stat-val">250</div></div>
+          <div class="exec-stat"><div class="exec-stat-label">Citas nuevas esta semana</div><div class="exec-stat-val">34</div></div>
+          <div class="exec-stat"><div class="exec-stat-label">Citas en pipeline</div><div class="exec-stat-val">110</div></div>
+          <div class="exec-stat"><div class="exec-stat-label">Nuevos leads captados</div><div class="exec-stat-val">132</div></div>
+          <div class="exec-stat"><div class="exec-stat-label">Tratamiento más demandado</div><div class="exec-stat-val" style="font-size:18px;">SmartLipo</div></div>
+          <div class="exec-stat"><div class="exec-stat-label">Conversión lograda</div><div class="exec-stat-val">1</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-brand">Molina Casasola · Cirugía &amp; Medicina Estética</div>
+  <div class="footer-note">Reporte generado el 29 de junio de 2026 · Datos extraídos de Kommo CRM · <em>Realzamos tu belleza natural</em></div>
+  <div class="footer-note" style="margin-top:6px;color:var(--gold);letter-spacing:1px;">Generado por <strong style="color:var(--gold);">Miaia.ai</strong></div>
+</footer>
+
+</body>
+</html>
