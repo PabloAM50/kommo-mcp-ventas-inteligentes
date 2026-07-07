@@ -141,17 +141,90 @@ app.use("/assets", express.static(path.resolve(__dirname, "..", "Assets")));
 
 // Serve weekly HTML reports — only files matching reporte_semanal_NN.html
 const reportsDir = path.resolve(__dirname, "..");
+const REPORT_FILE_RE = /^reporte_semanal_(\d{1,2})_(\d{1,2})_([a-z]+)_(\d{2})\.html$/;
+
+const CLIENTS = [
+  { slug: "Molinacasasola", name: "Molina Casasola" },
+];
+
+const PAGE_STYLE = `
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Inter:wght@300;400;500;600&display=swap');
+    :root{
+      --cream:#FAF8F3; --cream-card:#F5EFE6; --gold:#C5963A; --gold-fade:#F9F2E5;
+      --gold-light:#E2C07A; --charcoal:#1E1A17; --warm-mid:#5A5047; --warm-lt:#8A7D72;
+      --divider:#E5DDD3; --white:#FFFFFF;
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;background:var(--cream);color:var(--warm-mid);font-family:'Inter',sans-serif;
+      min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+    .panel{max-width:560px;width:100%;}
+    h1{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:2.2rem;color:var(--charcoal);margin:0 0 4px;}
+    .eyebrow{font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:18px;
+      padding-bottom:14px;border-bottom:1px solid var(--divider);}
+    ul{list-style:none;margin:0;padding:0;}
+    li + li{margin-top:10px;}
+    a.item{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;
+      background:var(--white);border:1px solid var(--divider);border-radius:8px;
+      color:var(--charcoal);text-decoration:none;font-size:1rem;transition:border-color .15s,background .15s;}
+    a.item:hover{border-color:var(--gold);background:var(--gold-fade);}
+    a.item .arrow{color:var(--gold);}
+    .empty{color:var(--warm-lt);font-style:italic;padding:16px 0;}
+    .footer-note{margin-top:24px;font-size:.75rem;color:var(--warm-lt);}
+    .footer-note strong{color:var(--gold);}
+  </style>
+`;
+
+function monthName(m: string): string {
+  const map: Record<string, string> = {
+    "01": "enero", "02": "febrero", "03": "marzo", "04": "abril", "05": "mayo", "06": "junio",
+    "07": "julio", "08": "agosto", "09": "septiembre", "10": "octubre", "11": "noviembre", "12": "diciembre",
+  };
+  return map[m] || m;
+}
+
+app.get("/reportes", (_req, res) => {
+  const items = CLIENTS.map(c =>
+    `<li><a class="item" href="/reportes/${c.slug}"><span>${c.name}</span><span class="arrow">&rarr;</span></a></li>`
+  ).join("");
+  res.send(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+    <title>Reportes</title>${PAGE_STYLE}</head><body>
+    <div class="panel">
+      <div class="eyebrow">Reportes semanales</div>
+      <h1>Selecciona un cliente</h1>
+      <ul style="margin-top:20px;">${items}</ul>
+      <div class="footer-note">Generado por <strong>Miaia.ai</strong></div>
+    </div></body></html>`);
+});
+
 app.get("/reportes/Molinacasasola", (_req, res) => {
   const files = readdirSync(reportsDir)
-    .filter(f => /^reporte_semanal_\d{1,2}_\d{1,2}_[a-z]+_\d{2}\.html$/.test(f))
+    .filter(f => REPORT_FILE_RE.test(f))
     .sort()
     .reverse();
-  if (files.length === 0) { res.status(404).send("No hay reportes disponibles."); return; }
-  res.redirect(`/reportes/Molinacasasola/${files[0]}`);
+
+  const items = files.length
+    ? files.map(f => {
+        const m = f.match(REPORT_FILE_RE)!;
+        const [, d1, d2, mon, yy] = m;
+        const label = `${d1} – ${d2} de ${monthName(mon)} de 20${yy}`;
+        return `<li><a class="item" href="/reportes/Molinacasasola/${f}"><span>${label}</span><span class="arrow">&rarr;</span></a></li>`;
+      }).join("")
+    : `<div class="empty">No hay reportes disponibles.</div>`;
+
+  res.send(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+    <title>Reportes · Molina Casasola</title>${PAGE_STYLE}</head><body>
+    <div class="panel">
+      <div class="eyebrow"><a href="/reportes" style="color:var(--gold);text-decoration:none;">&larr; Clientes</a> · Molina Casasola</div>
+      <h1>Reportes semanales</h1>
+      <ul style="margin-top:20px;">${items}</ul>
+      <div class="footer-note">Generado por <strong>Miaia.ai</strong></div>
+    </div></body></html>`);
 });
+
 app.get("/reportes/Molinacasasola/:filename", (req, res) => {
   const { filename } = req.params;
-  if (!/^reporte_semanal_\d{1,2}_\d{1,2}_[a-z]+_\d{2}\.html$/.test(filename)) {
+  if (!REPORT_FILE_RE.test(filename)) {
     res.status(404).send("Not found");
     return;
   }
