@@ -20,11 +20,12 @@ La clínica trabaja con **dos embudos** que NO son equivalentes:
 
 **Tratamientos reales:** los leads de Meta Ads llevan **tags** con el tratamiento de interés (Blefaroplastia, SmartLipo, Rinoplastia, Armonización facial…). Estos tags se cuentan para la sección de tratamientos. **Importante:** excluir los tags que empiezan por `fb` (son IDs internos de campaña de Facebook, no tratamientos).
 
-## 0. Determinar fechas y número de reporte
+## 0. Determinar fechas y detectar semanas atrasadas
 
 1. Calcular el lunes y domingo de la semana actual (o semana anterior si es lunes antes de las 10h).
-2. Listar archivos `reporte_semanal_NN.html` en el directorio del proyecto para determinar el último número. El siguiente será NN+1 (con cero a la izquierda, e.g., `02`, `03`...).
-3. Formatear las fechas en español: "14 – 21 de Junio 2026".
+2. Leer `reporte_semanal_history.json` (raíz del proyecto) y mirar el `week_end` de la última entrada. Ese es el último reporte real generado — **no asumas que es la semana pasada**, puede haber huecos si el cron falló o se saltó ejecuciones.
+3. Si hay una o más semanas completas entre ese `week_end` y la semana actual sin reporte, **hay que generarlas todas, en orden cronológico**, antes (o junto con) la semana actual — no saltar directo a "hoy". Cada semana atrasada es una llamada a `get_events` con su propio rango de fechas exacto (ver sección 2.1); eso da datos 100% reales para la progresión de esa semana. Las secciones de estado actual (embudo, tratamientos, conversaciones, contactos) se generan igual en todas las semanas de la tanda porque Kommo no guarda fotos históricas — ver aviso en la sección 2.5.
+4. Formatear las fechas en español: "14 – 21 de Junio 2026" (mismo mes) o "27 de Julio – 2 de Agosto 2026" (cruza de mes).
 
 ## 1. Llamadas a Kommo (en paralelo por bloques)
 
@@ -104,6 +105,24 @@ Si no hay tags de tratamiento válidos, **omitir la sección** de tratamientos e
 - Conversaciones en activo: campo `total` de `get_talks(in_work)`
 - Tareas pendientes: contar items de `get_tasks`
 
+**Cuidado con "total":** varias tools (`get_leads`, `get_contacts`, `get_talks`) devuelven `total` = número de items en esa página, no necesariamente el total real de la cuenta si hay más de `limit` registros. Si el `total` devuelto es exactamente igual al `limit` pedido, probablemente hay más datos de los que se ven — pedir `page: 2` si hace falta el conteo real (p.ej. para `lead_added` de una semana con mucho volumen).
+
+### 2.5 Limitación importante: snapshot vs. histórico
+
+Solo `get_events` y `get_pipeline_movements` tienen fecha real (log de eventos) y se pueden pedir con precisión para **cualquier** rango pasado. El resto de tools (`get_pipeline_leads_summary`, `get_leads` con sus tags, `get_talks`, `get_contacts`, `get_unread_talks`) **no aceptan fecha** — devuelven el estado *actual* del CRM, sin importar qué semana se esté reportando. Kommo no guarda una "foto" histórica de cómo estaba el pipeline en una fecha pasada.
+
+**Consecuencia práctica:**
+- Si el reporte se genera **en su semana correspondiente** (cadencia semanal real vía cron), esto no es un problema: el "estado actual" capturado ese día sí es el estado real de esa semana.
+- Si se generan **varias semanas atrasadas de golpe** (catch-up), las secciones de embudo comercial, tratamientos más demandados, conversaciones y contactos saldrán **idénticas** en todas las semanas de la tanda, porque todas leen el mismo "ahora". Solo la progresión semanal (2.1) y los nuevos leads (2.4) son exactos y distintos por semana, porque vienen del log de eventos.
+- En catch-up, añadir una nota breve en la sección de progresión indicando que el embudo/tratamientos reflejan el estado actual del CRM, no una foto de esa semana (ver ejemplo en `reporte_semanal_27_julio_2_agosto_26.html`).
+
+### 2.6 Leer la semana anterior antes de escribir el resumen ejecutivo
+
+Antes de redactar el resumen ejecutivo y los "Datos destacados", leer `reporte_semanal_history.json` y coger la **última entrada** (la semana inmediatamente anterior a la que se está generando). Usarla para:
+- Frasear la evolución real: "las citas acumuladas se mantienen en 110" o "el tratamiento más demandado sigue siendo SmartLipo (41%)" en vez de repetir números sueltos sin contexto.
+- Detectar si algún número acumulado (leads activos, citas en pipeline, contrataciones) cambió respecto a la semana anterior — si cambió, es una señal real de movimiento en el CRM y vale la pena destacarlo; si no cambió, es la limitación de snapshot descrita en 2.5, no una semana "sin actividad" (evitar decir eso, para no chocar con el tono positivo).
+- No hace falta parsear el HTML anterior (pesa mucho por el logo en base64) — todos los números clave ya están en `reporte_semanal_history.json`.
+
 ## 3. Construir el HTML
 
 ### Diseño de marca (obligatorio — no cambiar)
@@ -167,28 +186,36 @@ with open("Assets/logo-molina-casasola.png", "rb") as f:
 
 ## 4. Guardar el archivo
 
-El nombre incluye el rango de fechas de la semana:
+El nombre incluye el rango de fechas de la semana. Hay **dos patrones**, según si la semana cae dentro de un solo mes o cruza de mes:
 
 ```
-reporte_semanal_DD_DD_mes_AA.html
+reporte_semanal_DD_DD_mes_AA.html                (misma mes)
+reporte_semanal_DD_mes1_DD_mes2_AA.html          (cruza de mes)
 ```
 
 Ejemplos:
 - `reporte_semanal_14_21_junio_26.html`
-- `reporte_semanal_22_28_junio_26.html`
-- `reporte_semanal_01_07_julio_26.html`
+- `reporte_semanal_3_9_agosto_26.html`
+- `reporte_semanal_27_julio_2_agosto_26.html` (cruza julio→agosto)
 
 Reglas:
 - DD = día sin cero inicial (14, 7, 1...)
-- mes = nombre del mes en español en minúsculas (enero, febrero, marzo, abril, mayo, junio, julio, agosto, septiembre, octubre, noviembre, diciembre)
+- mes = nombre del mes en español en minúsculas
 - AA = últimos 2 dígitos del año (26, 27...)
 
-También sobrescribir `reporte_semanal.html` como template base actualizado.
+**Importante — mantener sincronizado con el servidor:** `src/server.ts` sirve `/reportes/Molinacasasola` leyendo el directorio del proyecto y filtrando con dos regex (`SAME_MONTH_RE` y `CROSS_MONTH_RE`) que deben coincidir exactamente con estos dos patrones. Si algún día cambia la convención de nombres, hay que actualizar esos regex (y el parseo del `sortKey` que ordena los reportes cronológicamente) en `src/server.ts`, o el reporte nuevo no aparecerá en la web aunque el archivo exista. El `Dockerfile` copia `reporte_semanal*.html` en build time — el archivo nuevo solo llega a producción si se commitea, se pushea a `main` y Dokploy redeploya.
 
-## 5. Confirmar al usuario
+También sobrescribir `reporte_semanal.html` como template base actualizado (solo con el reporte de la semana MÁS RECIENTE de la tanda).
+
+## 5. Actualizar el historial
+
+Añadir una entrada al final de `reporte_semanal_history.json` (raíz del proyecto) con los números clave de la semana recién generada: `week_start`, `week_end`, `file`, `leads_meta_ads_activos`, `citas_acumuladas_pipeline`, `citas_nuevas_semana`, `whatsapps_semana`, `confirmadas_semana`, `asistencias_semana`, `contrataciones_semana`, `logrados_semana`, `nuevos_leads_semana`, `contrataciones_acumuladas`, `leads_organicos_pool`, `conversaciones_cerradas`, `conversaciones_activas`, `conversaciones_sin_leer`, `tratamiento_top`, `tratamiento_top_pct`, `generated_at`. Si el reporte se generó en catch-up o a mitad de semana, añadir un `note` explicándolo (ver entradas existentes como ejemplo). Este archivo es lo que la sección 2.6 usa la próxima vez para comparar contra la semana anterior — si no se actualiza, el siguiente reporte pierde el contexto de evolución.
+
+## 6. Confirmar al usuario
 
 Indicar:
-- Nombre del archivo guardado (`reporte_semanal_NN.html`)
-- Rango de fechas del reporte
+- Nombre(s) del archivo(s) guardado(s)
+- Rango de fechas de cada reporte
 - Las 3-4 métricas principales del resumen (leads Meta Ads, citas agendadas, contrataciones, conversaciones)
 - El tratamiento más demandado (con dato real de tags)
+- Si el reporte quedó solo en local o se commiteó/pusheó (recordar que el sitio desplegado necesita push + redeploy en Dokploy para reflejar el archivo nuevo)

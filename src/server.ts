@@ -141,7 +141,15 @@ app.use("/assets", express.static(path.resolve(__dirname, "..", "Assets")));
 
 // Serve weekly HTML reports — only files matching reporte_semanal_NN.html
 const reportsDir = path.resolve(__dirname, "..");
-const REPORT_FILE_RE = /^reporte_semanal_(\d{1,2})_(\d{1,2})_([a-z]+)_(\d{2})\.html$/;
+// Same-month week: reporte_semanal_10_16_agosto_26.html
+const SAME_MONTH_RE = /^reporte_semanal_(\d{1,2})_(\d{1,2})_([a-z]+)_(\d{2})\.html$/;
+// Week that crosses a month boundary: reporte_semanal_27_julio_2_agosto_26.html
+const CROSS_MONTH_RE = /^reporte_semanal_(\d{1,2})_([a-z]+)_(\d{1,2})_([a-z]+)_(\d{2})\.html$/;
+
+const MONTH_NUMS: Record<string, number> = {
+  enero: 1, febrero: 2, marzo: 3, abril: 4, mayo: 5, junio: 6,
+  julio: 7, agosto: 8, septiembre: 9, octubre: 10, noviembre: 11, diciembre: 12,
+};
 
 const CLIENTS = [
   { slug: "Molinacasasola", name: "Molina Casasola" },
@@ -183,6 +191,31 @@ function monthName(m: string): string {
   return map[m] || m;
 }
 
+function isReportFile(f: string): boolean {
+  return SAME_MONTH_RE.test(f) || CROSS_MONTH_RE.test(f);
+}
+
+// Parses a report filename into a display label and a numeric sort key
+// (year*10000 + endMonth*100 + endDay) so weeks sort chronologically even
+// when day numbers aren't zero-padded (e.g. "3_9_agosto" vs "10_16_agosto").
+function parseReportFile(f: string): { label: string; sortKey: number } | null {
+  let m = f.match(SAME_MONTH_RE);
+  if (m) {
+    const [, d1, d2, mon, yy] = m;
+    const label = `${d1} – ${d2} de ${monthName(mon)} de 20${yy}`;
+    const sortKey = Number(`20${yy}`) * 10000 + (MONTH_NUMS[mon] || 0) * 100 + Number(d2);
+    return { label, sortKey };
+  }
+  m = f.match(CROSS_MONTH_RE);
+  if (m) {
+    const [, d1, mon1, d2, mon2, yy] = m;
+    const label = `${d1} de ${monthName(mon1)} – ${d2} de ${monthName(mon2)} de 20${yy}`;
+    const sortKey = Number(`20${yy}`) * 10000 + (MONTH_NUMS[mon2] || 0) * 100 + Number(d2);
+    return { label, sortKey };
+  }
+  return null;
+}
+
 app.get("/reportes", (_req, res) => {
   const items = CLIENTS.map(c =>
     `<li><a class="item" href="/reportes/${c.slug}"><span>${c.name}</span><span class="arrow">&rarr;</span></a></li>`
@@ -199,17 +232,14 @@ app.get("/reportes", (_req, res) => {
 
 app.get("/reportes/Molinacasasola", (_req, res) => {
   const files = readdirSync(reportsDir)
-    .filter(f => REPORT_FILE_RE.test(f))
-    .sort()
-    .reverse();
+    .map(f => ({ f, parsed: parseReportFile(f) }))
+    .filter((x): x is { f: string; parsed: { label: string; sortKey: number } } => x.parsed !== null)
+    .sort((a, b) => b.parsed.sortKey - a.parsed.sortKey);
 
   const items = files.length
-    ? files.map(f => {
-        const m = f.match(REPORT_FILE_RE)!;
-        const [, d1, d2, mon, yy] = m;
-        const label = `${d1} – ${d2} de ${monthName(mon)} de 20${yy}`;
-        return `<li><a class="item" href="/reportes/Molinacasasola/${f}"><span>${label}</span><span class="arrow">&rarr;</span></a></li>`;
-      }).join("")
+    ? files.map(({ f, parsed }) =>
+        `<li><a class="item" href="/reportes/Molinacasasola/${f}"><span>${parsed.label}</span><span class="arrow">&rarr;</span></a></li>`
+      ).join("")
     : `<div class="empty">No hay reportes disponibles.</div>`;
 
   res.send(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
@@ -224,7 +254,7 @@ app.get("/reportes/Molinacasasola", (_req, res) => {
 
 app.get("/reportes/Molinacasasola/:filename", (req, res) => {
   const { filename } = req.params;
-  if (!REPORT_FILE_RE.test(filename)) {
+  if (!isReportFile(filename)) {
     res.status(404).send("Not found");
     return;
   }
