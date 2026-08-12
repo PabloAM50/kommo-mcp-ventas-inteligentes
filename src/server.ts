@@ -184,6 +184,11 @@ const PAGE_STYLE = `
     .empty{color:var(--warm-lt);font-style:italic;padding:16px 0;}
     .footer-note{margin-top:24px;font-size:.75rem;color:var(--warm-lt);}
     .footer-note strong{color:var(--gold);}
+    .unread-summary{display:none;font-size:.8rem;color:var(--gold);margin:-8px 0 18px;font-weight:500;}
+    a.item.unread{border-color:var(--gold-light);}
+    .unread-dot{display:none;width:8px;height:8px;border-radius:50%;background:var(--gold);margin-right:10px;flex-shrink:0;}
+    a.item.unread .unread-dot{display:inline-block;}
+    .item-label{display:flex;align-items:center;}
   </style>
 `;
 
@@ -242,7 +247,7 @@ app.get("/reportes/Molinacasasola", (_req, res) => {
 
   const items = files.length
     ? files.map(({ f, parsed }) =>
-        `<li><a class="item" href="/reportes/Molinacasasola/${f}"><span>${parsed.label}</span><span class="arrow">&rarr;</span></a></li>`
+        `<li><a class="item" data-file="${f}" href="/reportes/Molinacasasola/${f}"><span class="item-label"><span class="unread-dot"></span>${parsed.label}</span><span class="arrow">&rarr;</span></a></li>`
       ).join("")
     : `<div class="empty">No hay reportes disponibles.</div>`;
 
@@ -251,9 +256,40 @@ app.get("/reportes/Molinacasasola", (_req, res) => {
     <div class="panel">
       <div class="eyebrow"><a href="/reportes" style="color:var(--gold);text-decoration:none;">&larr; Clientes</a> · Molina Casasola</div>
       <h1>Reportes semanales</h1>
+      <div class="unread-summary" id="unread-summary"></div>
       <ul style="margin-top:20px;">${items}</ul>
       <div class="footer-note">Generado por <strong>Miaia.ai</strong></div>
-    </div></body></html>`);
+    </div>
+    <script>
+      (function () {
+        var KEY = "miaia_reportes_leidos_molinacasasola";
+        var read = [];
+        try { read = JSON.parse(localStorage.getItem(KEY) || "[]"); } catch (e) { read = []; }
+        var links = document.querySelectorAll("a.item[data-file]");
+        var unreadCount = 0;
+        links.forEach(function (a) {
+          var f = a.getAttribute("data-file");
+          if (read.indexOf(f) === -1) {
+            a.classList.add("unread");
+            unreadCount++;
+          }
+          a.addEventListener("click", function () {
+            if (read.indexOf(f) === -1) {
+              read.push(f);
+              try { localStorage.setItem(KEY, JSON.stringify(read)); } catch (e) {}
+            }
+          });
+        });
+        var summary = document.getElementById("unread-summary");
+        if (unreadCount > 0) {
+          summary.textContent = unreadCount === 1
+            ? "1 reporte nuevo desde tu última visita"
+            : unreadCount + " reportes nuevos desde tu última visita";
+          summary.style.display = "block";
+        }
+      })();
+    </script>
+    </body></html>`);
 });
 
 app.get("/reportes/Molinacasasola/:filename", (req, res) => {
