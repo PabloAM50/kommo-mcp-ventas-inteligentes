@@ -132,6 +132,10 @@ app.delete("/mcp", async (req, res) => {
   await transports[sessionId].handleRequest(req, res);
 });
 
+app.get("/", (_req, res) => {
+  res.redirect("/reportes/Molinacasasola");
+});
+
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", tools: Object.keys(allTools).length, version: "1.2.0" });
 });
