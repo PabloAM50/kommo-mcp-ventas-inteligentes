@@ -22,10 +22,13 @@ La clínica trabaja con **dos embudos** que NO son equivalentes:
 
 ## 0. Determinar fechas y detectar semanas atrasadas
 
-1. Calcular el lunes y domingo de la semana actual (o semana anterior si es lunes antes de las 10h).
+**Regla de oro — NUNCA generar una semana que no ha terminado.** La última semana reportable es la última semana ISO completa (lunes-domingo) cuyo `week_end` (domingo) ya pasó respecto a hoy — `week_end < hoy`, nunca `>=`. Si hoy es miércoles y la semana en curso es lunes-domingo, esa semana NO se reporta todavía; la última reportable es la anterior. **Este fue exactamente el bug del 12/08/2026**: se generó "10-16 agosto" en miércoles con datos de solo 3 días (lunes-miércoles) etiquetados como si fuera la semana completa — hubo que borrar el archivo, su entrada en `reporte_semanal_history.json` y restaurar `reporte_semanal.html` desde el último reporte completo válido. Antes de generar cualquier semana, comprobar `week_end < hoy`; si no se cumple, esa semana se salta.
+
+1. Calcular la última semana ISO completa (lunes-domingo) según la regla de oro anterior.
 2. Leer `reporte_semanal_history.json` (raíz del proyecto) y mirar el `week_end` de la última entrada. Ese es el último reporte real generado — **no asumas que es la semana pasada**, puede haber huecos si el cron falló o se saltó ejecuciones.
-3. Si hay una o más semanas completas entre ese `week_end` y la semana actual sin reporte, **hay que generarlas todas, en orden cronológico**, antes (o junto con) la semana actual — no saltar directo a "hoy". Cada semana atrasada es una llamada a `get_events` con su propio rango de fechas exacto (ver sección 2.1); eso da datos 100% reales para la progresión de esa semana. Las secciones de estado actual (embudo, tratamientos, conversaciones, contactos) se generan igual en todas las semanas de la tanda porque Kommo no guarda fotos históricas — ver aviso en la sección 2.5.
+3. Semanas a generar = todas las semanas completas entre ese `week_end` (exclusive) y la última semana completa del paso 1 (inclusive), **en orden cronológico**. Cada semana atrasada es una llamada a `get_events` con su propio rango de fechas exacto (ver sección 2.1); eso da datos 100% reales para la progresión de esa semana. Las secciones de estado actual (embudo, tratamientos, conversaciones, contactos) se generan igual en todas las semanas de la tanda porque Kommo no guarda fotos históricas — ver aviso en la sección 2.5.
 4. Formatear las fechas en español: "14 – 21 de Junio 2026" (mismo mes) o "27 de Julio – 2 de Agosto 2026" (cruza de mes).
+5. **Cadencia recomendada (cron semanal cada lunes):** si el cron corre el lunes por la mañana, la semana anterior (lunes-domingo, recién terminada la noche del domingo) ya cumple la regla de oro y es exactamente la que toca generar — no la semana que acaba de empezar ese lunes.
 
 ## 1. Llamadas a Kommo (en paralelo por bloques)
 
@@ -154,6 +157,38 @@ with open("Assets/logo-molina-casasola.png", "rb") as f:
     logo_b64 = base64.b64encode(f.read()).decode()
 ```
 
+### Header — markup exacto (obligatorio desde 12/08/2026)
+
+```html
+<header>
+  <div class="header-back"><a href="/reportes/Molinacasasola" class="back-link">&larr; Volver a reportes</a></div>
+  <div class="header-inner">
+    <div class="brand">
+      <a href="/reportes/Molinacasasola"><img src="data:image/png;base64,[LOGO_B64]" alt="Molina Casasola"></a>
+    </div>
+    <div class="report-info">
+      <div class="report-type">Reporte Semanal de CRM</div>
+      <div class="report-title">Resumen de Actividad</div>
+      <div class="report-date">[RANGO DE FECHAS]</div>
+    </div>
+  </div>
+</header>
+```
+
+Y en el `<style>`, junto al resto de reglas de `.brand`:
+
+```css
+.header-back{max-width:1080px;margin:0 auto 14px;}
+.back-link{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);text-decoration:none;font-weight:500;}
+.back-link:hover{text-decoration:underline;}
+.brand a{display:flex;align-items:center;text-decoration:none;}
+```
+
+**Reglas:**
+- **NUNCA** añadir el nombre de la clínica en texto junto al logo (nada de `<div class="brand-name">Molina Casasola</div>` / `<div class="brand-sub">...</div>`). El logo PNG ya incluye el nombre — ponerlo también en texto duplica visualmente la marca. Bug real: hasta el 12/08/2026 los 7 reportes más recientes tenían esta duplicación y hubo que arreglarlos uno a uno.
+- El logo y la flecha "Volver" deben enlazar siempre a `/reportes/Molinacasasola` (el listado de reportes del cliente).
+- La forma más segura de no romper esto: copiar el bloque `<header>...</header>` completo y su CSS tal cual del último `reporte_semanal_*.html` generado, y cambiar únicamente `[LOGO_B64]` (si cambia el logo) y `[RANGO DE FECHAS]`. No reescribir el header desde cero.
+
 ### Estructura de secciones
 
 1. **Header** — logo base64 + "Reporte Semanal" + rango de fechas
@@ -218,4 +253,13 @@ Indicar:
 - Rango de fechas de cada reporte
 - Las 3-4 métricas principales del resumen (leads Meta Ads, citas agendadas, contrataciones, conversaciones)
 - El tratamiento más demandado (con dato real de tags)
-- Si el reporte quedó solo en local o se commiteó/pusheó (recordar que el sitio desplegado necesita push + redeploy en Dokploy para reflejar el archivo nuevo)
+- Si el reporte quedó solo en local o se commiteó/pusheó (recordar que el sitio desplegado necesita push + redeploy en Dokploy para reflejar el archivo nuevo). **Desde 12/08/2026** el cliente está montando su propio agente programado (Claude Code) con el MCP de Kommo y el MCP de GitHub conectados, que invoca este skill cada lunes y se encarga él mismo del commit/push — si te invocan dentro de ese flujo automatizado, procede con el commit/push; si te invocan sueltos/manualmente (como en una sesión de chat normal), pregunta antes de pushear.
+
+## 7. Recuperación — si se generó una semana incompleta por error
+
+Si el skill (o alguien manualmente) generó un reporte que rompe la regla de oro de la sección 0 (semana con `week_end >= hoy`), no lo "arregles" rellenando los días que faltan — bórralo y espera a que la semana termine de verdad:
+
+1. Borrar el archivo `reporte_semanal_DD_DD_mes_AA.html` incompleto.
+2. Borrar su entrada correspondiente en `reporte_semanal_history.json`.
+3. Restaurar `reporte_semanal.html` (la plantilla base) copiando el contenido del último reporte **completo** válido — normalmente el que quedó como penúltima entrada del history antes del borrado.
+4. La semana volverá a generarse sola, completa, la próxima vez que le toque por calendario (ver sección 0.5).
