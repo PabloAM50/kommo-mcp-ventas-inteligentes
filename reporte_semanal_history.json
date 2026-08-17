@@ -46,6 +46,29 @@
       "tratamiento_top_pct": 41,
       "generated_at": "2026-08-12",
       "note": "Generado en catch-up (retroactivo). Progresión semanal real (eventos); embudo/tratamientos/conversaciones reflejan el estado del CRM al 12/08, no una foto histórica de esa semana."
+    },
+    {
+      "week_start": "2026-08-10",
+      "week_end": "2026-08-16",
+      "file": "reporte_semanal_10_16_agosto_26.html",
+      "leads_meta_ads_activos": 250,
+      "citas_acumuladas_pipeline": 110,
+      "citas_nuevas_semana": 12,
+      "whatsapps_semana": 52,
+      "confirmadas_semana": 0,
+      "asistencias_semana": 0,
+      "contrataciones_semana": 0,
+      "logrados_semana": 0,
+      "nuevos_leads_semana": 121,
+      "contrataciones_acumuladas": 1,
+      "leads_organicos_pool": 250,
+      "conversaciones_cerradas": 2,
+      "conversaciones_activas": 248,
+      "conversaciones_sin_leer": 50,
+      "tratamiento_top": "SmartLipo",
+      "tratamiento_top_pct": 41,
+      "generated_at": "2026-08-17",
+      "note": "Generado por cron semanal (lunes) para la semana recién terminada. Embudo/tratamientos/conversaciones reflejan el estado actual del CRM al 17/08 (limitación de snapshot, sección 2.5 del skill); la progresión semanal (WhatsApps, citas, nuevos leads) proviene de get_events con fecha real y es exacta para esta semana."
     }
   ]
 }
