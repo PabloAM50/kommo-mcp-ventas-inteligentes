@@ -69,6 +69,29 @@
       "tratamiento_top_pct": 41,
       "generated_at": "2026-08-17",
       "note": "Generado por cron semanal (lunes) para la semana recién terminada. Embudo/tratamientos/conversaciones reflejan el estado actual del CRM al 17/08 (limitación de snapshot, sección 2.5 del skill); la progresión semanal (WhatsApps, citas, nuevos leads) proviene de get_events con fecha real y es exacta para esta semana."
+    },
+    {
+      "week_start": "2026-08-17",
+      "week_end": "2026-08-23",
+      "file": "reporte_semanal_17_23_agosto_26.html",
+      "leads_meta_ads_activos": 250,
+      "citas_acumuladas_pipeline": 110,
+      "citas_nuevas_semana": 0,
+      "whatsapps_semana": 0,
+      "confirmadas_semana": 0,
+      "asistencias_semana": 0,
+      "contrataciones_semana": 0,
+      "logrados_semana": 0,
+      "nuevos_leads_semana": 123,
+      "contrataciones_acumuladas": 1,
+      "leads_organicos_pool": 250,
+      "conversaciones_cerradas": 2,
+      "conversaciones_activas": 248,
+      "conversaciones_sin_leer": 50,
+      "tratamiento_top": "SmartLipo",
+      "tratamiento_top_pct": 41,
+      "generated_at": "2026-08-24",
+      "note": "Generado por cron semanal (lunes) para la semana recién terminada. Embudo/tratamientos/conversaciones reflejan el estado actual del CRM al 24/08 (limitación de snapshot, sección 2.5 del skill). La progresión semanal proviene de get_events con fecha real (created_at_from/to 2026-08-17T00:00:00Z a 2026-08-23T23:59:59Z) y es exacta para esta semana: en ese rango no se registraron eventos lead_status_changed dentro del pipeline Meta Ads (13858912) — todos los 43 eventos de cambio de estado de la semana correspondieron al embudo orgánico (13401443, Incoming leads → PRIMER CONTACTO) — por lo que whatsapps_semana, citas_nuevas_semana, confirmadas_semana, asistencias_semana, contrataciones_semana y logrados_semana son 0 de forma real y verificada, no un error de conteo. Los 123 nuevos leads (lead_added) sí se incorporaron con normalidad al CRM esta semana."
     }
   ]
 }
