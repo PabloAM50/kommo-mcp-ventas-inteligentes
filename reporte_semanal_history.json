@@ -92,6 +92,29 @@
       "tratamiento_top_pct": 41,
       "generated_at": "2026-08-24",
       "note": "Generado por cron semanal (lunes) para la semana recién terminada. Embudo/tratamientos/conversaciones reflejan el estado actual del CRM al 24/08 (limitación de snapshot, sección 2.5 del skill). La progresión semanal proviene de get_events con fecha real (created_at_from/to 2026-08-17T00:00:00Z a 2026-08-23T23:59:59Z) y es exacta para esta semana: en ese rango no se registraron eventos lead_status_changed dentro del pipeline Meta Ads (13858912) — todos los 43 eventos de cambio de estado de la semana correspondieron al embudo orgánico (13401443, Incoming leads → PRIMER CONTACTO) — por lo que whatsapps_semana, citas_nuevas_semana, confirmadas_semana, asistencias_semana, contrataciones_semana y logrados_semana son 0 de forma real y verificada, no un error de conteo. Los 123 nuevos leads (lead_added) sí se incorporaron con normalidad al CRM esta semana."
+    },
+    {
+      "week_start": "2026-08-24",
+      "week_end": "2026-08-30",
+      "file": "reporte_semanal_24_30_agosto_26.html",
+      "leads_meta_ads_activos": 250,
+      "citas_acumuladas_pipeline": 110,
+      "citas_nuevas_semana": 41,
+      "whatsapps_semana": 96,
+      "confirmadas_semana": 0,
+      "asistencias_semana": 0,
+      "contrataciones_semana": 0,
+      "logrados_semana": 0,
+      "nuevos_leads_semana": 153,
+      "contrataciones_acumuladas": 1,
+      "leads_organicos_pool": 250,
+      "conversaciones_cerradas": 19,
+      "conversaciones_activas": 231,
+      "conversaciones_sin_leer": 50,
+      "tratamiento_top": "SmartLipo",
+      "tratamiento_top_pct": 41,
+      "generated_at": "2026-08-31",
+      "note": "Generado por cron semanal (lunes) para la semana recién terminada. Embudo/tratamientos/conversaciones reflejan el estado actual del CRM al 31/08 (limitación de snapshot, sección 2.5 del skill). La progresión semanal proviene de get_events con fecha real (created_at_from/to 2026-08-24T00:00:00Z a 2026-08-30T23:59:59Z, paginado a 286 eventos lead_status_changed en total): 96 movimientos a ENVIAMOS WHATSAPP, 41 a CITA AGENDADA, 69 a NO CONTESTA, 19 a NO INTERESADO y 7 a LLAMAR MÁS TARDE dentro de Meta Ads (13858912), sin eventos de CITA CONFIRMADA, ASISTIÓ A LA CITA, CONTRATA TRATAMIENTO ni Logrado con éxito esta semana; 54 eventos adicionales correspondieron al embudo orgánico (13401443). Los 153 nuevos leads (lead_added, ambos embudos) superan los 123 de la semana anterior. Conversaciones cerradas/activas (19/231) se recalcularon a partir del campo real 'status' de cada conversación devuelta por get_talks, ya que el filtro status=closed/in_work de la herramienta no se aplicó del lado del servidor y ambas llamadas devolvieron el mismo listado completo de 250 conversaciones."
     }
   ]
 }
